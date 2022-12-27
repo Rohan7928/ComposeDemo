@@ -1,133 +1,109 @@
 package com.example.composedemo.ui
 
-import android.widget.Toast
-import androidx.compose.foundation.background
+import android.content.Context
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CornerSize
-import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Button
+import androidx.compose.material.TextField
+import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
-import com.example.composedemo.Utils.Constants
-import com.example.composedemo.theme.ComposeDemoTheme
-import com.example.composedemo.ui.drawer.DrawerContent
-import com.example.composedemo.ui.navigation.NavHostContainer
-import com.example.composedemo.ui.appBar.MyTopAppBar
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import com.example.composedemo.R
 
 @Composable
-fun LoginPage() {
-
-    val navController = rememberNavController()
-    Scaffold(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.primary),
-    ) {
-
-        ComposeDemoTheme {
-            // remember navController so it does not
-            // get recreated on recomposition
-            Surface(color = MaterialTheme.colorScheme.primary) {
-                val scaffoldState = rememberScaffoldState()
-                val coroutineScope = rememberCoroutineScope()
-                val contextForToast = LocalContext.current.applicationContext
-                // Scaffold Component
-                Scaffold(scaffoldState = scaffoldState, topBar = {
-                    MyTopAppBar {
-                        coroutineScope.launch {
-                            scaffoldState.drawerState.open()
-                        }
-                    }
-                }, drawerContent = {
-                    DrawerContent { ItemLabel ->
-                        Toast.makeText(contextForToast, ItemLabel, Toast.LENGTH_SHORT).show()
-
-                        coroutineScope.launch {
-                            delay(300)
-                            scaffoldState.drawerState.close()
-                        }
-
-                    }
-                }, floatingActionButton = {
-                    FloatingActionButton(onClick = {
-                        navController.navigate("profile")
-                    }, content = {
-                        Column(
-                            modifier = Modifier.padding(PaddingValues(10.dp))
-                        ) {
-                            androidx.compose.material3.Icon(
-                                imageVector = Icons.Default.Person,
-                                contentDescription = "Person",
-                                modifier = Modifier.align(Alignment.CenterHorizontally)
-                            )
-                        }
-                    })
-                }, isFloatingActionButtonDocked = true,
-                    // Bottom navigation
-                    bottomBar = {
-                        BottomAppBar(cutoutShape = androidx.compose.material.MaterialTheme.shapes.small.copy(
-                            CornerSize(percent = 80)
-                        ),
-
-                            content = {
-                                val navBackStackEntry by navController.currentBackStackEntryAsState()
-                                // observe current route to change the icon
-                                // color,label color when navigated
-                                val currentRoute = navBackStackEntry?.destination?.route
-                                // Bottom nav items we declared
-                                Constants.BottomNavItems.forEach { navItem ->
-                                    // Place the bottom nav items
-                                    BottomNavigationItem(
-                                        modifier = Modifier.padding(0.dp, 0.dp, 10.dp, 0.dp),
-                                        // it currentRoute is equal then its selected route
-                                        selected = currentRoute == navItem.route,
-                                        // navigate on click
-                                        onClick = {
-                                            navController.navigate(navItem.route)
-                                        },
-                                        // Icon of navItem
-                                        icon = {
-                                            Icon(
-                                                imageVector = navItem.icon,
-                                                contentDescription = navItem.label
-                                            )
-                                        },
-                                        // label
-                                        label = {
-                                            Text(text = navItem.label)
-                                        }, alwaysShowLabel = false
-                                    )
-                                }
-                            })
-                        //BottomNavigationBar(navController = navController)
-                    }, content = { padding ->
-                        // Navhost: where screens are placed
-                        NavHostContainer(navController = navController, padding = padding)
-                    })
-            }
-        }
+fun LoginPage(navController: NavController) = Box(
+    modifier = Modifier
+        .fillMaxHeight()
+        .fillMaxWidth(), contentAlignment = Alignment.Center
+) {
+    //Initilazation
+    val mContext = LocalContext.current
+    val userName = remember {
+        mutableStateOf(TextFieldValue())
+    }
+    val password = remember {
+        mutableStateOf(TextFieldValue())
     }
 
+    Column(
+        modifier = Modifier
+            .padding(20.dp)
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Image(painter = painterResource(id = R.drawable.app_icon), contentDescription = "AppIcon")
+        Text(
+            text = "Login", fontSize = 24.sp, fontWeight = FontWeight.Bold
+        )
+        Spacer(modifier = Modifier.size(20.dp))
+        TextField(
+            shape = RoundedCornerShape(30.dp),
+            label = { Text(text = "UserName/Email") },
+            value = userName.value,
+            onValueChange = { userName.value = it },
+            colors = TextFieldDefaults.textFieldColors(
+                focusedIndicatorColor = Color.Transparent,
+                disabledIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                backgroundColor = Color.LightGray,
+            )
+        )
+        Spacer(modifier = Modifier.size(20.dp))
+        TextField(
+            shape = RoundedCornerShape(30.dp),
+            label = { Text(text = "Password") },
+            value = password.value,
+            onValueChange = { password.value = it },
+            colors = TextFieldDefaults.textFieldColors(
+                focusedIndicatorColor = Color.Transparent,
+                disabledIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                backgroundColor = Color.LightGray,
+            )
+        )
+        Spacer(modifier = Modifier.size(20.dp))
+        Button(
+            shape = RoundedCornerShape(30.dp),
+            modifier = Modifier
+                .width(150.dp)
+                .padding(10.dp),
+            onClick = { onClick(userName,password,navController,mContext)}) {
+            Text(text = "Submit",
+            color = Color.White)
+        }
+
+    }
 }
 
-
-/*
-
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview2() {
-    ComposeDemoTheme {
-        Greeting2()
+fun onClick(
+    userName: MutableState<TextFieldValue>,
+    password: MutableState<TextFieldValue>,
+    navController: NavController,
+    mContext: Context
+) {
+    if(userName.value.text.contains("Rohan") && password.value.text.contains("12345678"))
+    {
+        navController.navigate(Routes.DashBoard.route)
     }
-}*/
+    else {
+        showToast(mContext, "Please Enter Valid Credentials")
+    }
+}

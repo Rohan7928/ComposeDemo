@@ -5,13 +5,11 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.composedemo.ui.LoginPage
-import com.example.composedemo.ui.ProfileScreen
-import com.example.composedemo.ui.Routes
-import com.example.composedemo.ui.SplashScreen
+import com.example.composedemo.ui.*
 
 
 class MainActivity() : ComponentActivity() {
@@ -45,13 +43,18 @@ class MainActivity() : ComponentActivity() {
                     }
 
                     //Another Route : Profile
-                    composable(Routes.LoginPage.route) {
+                    composable(Routes.DashBoard.route) {
                         //Profile Screen
-                        LoginPage()
+                        DashBoard()
                     }
                     composable(Routes.ProfileScreen.route) {
                         //Profile Screen
                         ProfileScreen()
+                    }
+
+                    composable(Routes.LoginScreen.route) {
+                        //Profile Screen
+                        LoginPage(navController = navController)
                     }
 
                     /*    //Settings Route, Notice the "/{id}" in last, its the argument passed down from homeScreen
