@@ -1,114 +1,86 @@
-package com.example.composedemo
+package com.example.composedemo.ui
 
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import android.content.res.Configuration
+import android.graphics.SweepGradient
+import android.view.animation.OvershootInterpolator
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.background
-import androidx.compose.ui.Alignment
 import androidx.navigation.NavHostController
-import com.example.composedemo.ui.Routes
+import com.example.composedemo.R
+import com.example.composedemo.theme.ComposeDemoTheme
+import kotlinx.coroutines.delay
 
 
 @Composable
-fun SplashScreen(navController: NavHostController) {
+fun SplashScreen(
+    gradientColors: List<Color> = listOf(Color(0xFFF70A74), Color(0xFFF59118)),
+    navController: NavHostController
+) = Box(
+    modifier = Modifier
+        .fillMaxHeight()
+        .fillMaxWidth()
+        .background(brush = Brush.horizontalGradient(colors = gradientColors)),
+    contentAlignment = Alignment.Center
+) {
 
+    val scale = remember {
+        androidx.compose.animation.core.Animatable(0.0f)
+    }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(androidx.compose.ui.graphics.Color.White)
-    ) {
-
-
-        Row(
-            modifier = Modifier
-                .padding(all = 10.dp)
-                .align(Alignment.Center)
-        ) {
-            Image(
-                painter = painterResource(R.drawable.map),
-                contentDescription = "Contact profile picture",
-
-                modifier = Modifier
-                    .size(50.dp)
-                    .clip(CircleShape)
-                    .border(1.5.dp, MaterialTheme.colorScheme.secondary, CircleShape)
-
-            )
-            Spacer(modifier = Modifier.size(8.dp))
-
-
-            Column {
-                SearchBar()
-                Text(
-                    text = "Hello Welcome!", color = MaterialTheme.colorScheme.primary
-                )
-                Spacer(modifier = Modifier.size(4.dp))
-                Text(
-                    text = "Please Enter your name to join!",
-                    style = MaterialTheme.typography.bodyMedium
-                )
-                Spacer(modifier = Modifier.height(20.dp))
-                Box(modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
-                    Button(
-                        onClick = {
-                            navController.navigate(Routes.LoginPage.route)
-                        },
-                        shape = RoundedCornerShape(50.dp),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(40.dp)
-                    ) {
-                        Text(text = "Go To", color = androidx.compose.ui.graphics.Color.White)
-                    }
-                }
+    LaunchedEffect(key1 = true) {
+        scale.animateTo(
+            targetValue = 0.7f, animationSpec = tween(800, easing = {
+                OvershootInterpolator(4f).getInterpolation(it)
+            })
+        )
+        delay(1000)
+        navController.navigate(Routes.LoginPage.route) {
+            popUpTo(Routes.SplashScreen.route) {
+                inclusive = true
             }
         }
-
-
     }
-}
 
-@Composable
-fun SearchBar() {
-    var text by remember { mutableStateOf("") }
-    BasicTextField(
-        value = text,
-        onValueChange = { text = it },
-        textStyle = TextStyle(
-            color = MaterialTheme.colorScheme.primary,
-        ),
-        modifier = Modifier
-            .fillMaxWidth()
-            .heightIn(min = 30.dp)
-            .border(1.5.dp, MaterialTheme.colorScheme.primary)
-            .padding(10.dp),
+    Box(
+        modifier = Modifier.size(800.dp), contentAlignment = Alignment.Center
+    ) {
+        Image(
+            painter = painterResource(R.drawable.app_icon),
+            contentDescription = "Contact profile picture",
+
+            modifier = Modifier
+                .size(150.dp)
+                .clip(CircleShape)
 
         )
+    }
+
+
 }
 
 
-/*@Preview(name="Light Mode")
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES,
-    showBackground = true,
-    name= "Dark Mode")
+@Preview(name = "Light Mode")
+@Preview(
+    uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true, name = "Dark Mode"
+)
 @Composable
 fun DefaultPreview() {
-    ComposeDemoTheme {
-        Greeting(message = Message("Colleague", "Hey, take a look at Jetpack Compose, it's great!"))
-    }
-}*/
+    ComposeDemoTheme {}
+}
