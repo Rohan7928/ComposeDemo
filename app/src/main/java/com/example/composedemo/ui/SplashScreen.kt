@@ -1,5 +1,6 @@
 package com.example.composedemo.ui
 
+import android.content.Context
 import android.content.res.Configuration
 import android.graphics.SweepGradient
 import android.view.animation.OvershootInterpolator
@@ -13,20 +14,23 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.datastore.preferences.preferencesDataStore
 import androidx.navigation.NavHostController
 import com.example.composedemo.R
 import com.example.composedemo.theme.ComposeDemoTheme
+import com.example.composedemo.ui.data.Pref
 import kotlinx.coroutines.delay
-
 
 @Composable
 fun SplashScreen(
@@ -43,6 +47,11 @@ fun SplashScreen(
     val scale = remember {
         androidx.compose.animation.core.Animatable(0.0f)
     }
+    val mContext = LocalContext.current
+    val pref = remember {
+        Pref(mContext)
+    }
+    val userName = pref.getUserName.collectAsState("").value;
 
     LaunchedEffect(key1 = true) {
         scale.animateTo(
@@ -51,9 +60,13 @@ fun SplashScreen(
             })
         )
         delay(1000)
-        navController.navigate(Routes.LoginScreen.route) {
-            popUpTo(Routes.SplashScreen.route) {
-                inclusive = true
+        if (!userName.isNullOrEmpty()) {
+            navController.navigate(Routes.DashBoard.route)
+        } else {
+            navController.navigate(Routes.LoginScreen.route) {
+                popUpTo(Routes.SplashScreen.route) {
+                    inclusive = true
+                }
             }
         }
     }

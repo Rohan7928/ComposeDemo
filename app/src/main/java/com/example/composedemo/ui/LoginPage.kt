@@ -10,10 +10,7 @@ import androidx.compose.material.Button
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -24,7 +21,12 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.compose.navArgument
 import com.example.composedemo.R
+import com.example.composedemo.ui.data.LoginModel
+import com.example.composedemo.ui.data.Pref
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 @Composable
 fun LoginPage(navController: NavController) = Box(
@@ -33,14 +35,6 @@ fun LoginPage(navController: NavController) = Box(
         .fillMaxWidth(), contentAlignment = Alignment.Center
 ) {
     //Initilazation
-    val mContext = LocalContext.current
-    val userName = remember {
-        mutableStateOf(TextFieldValue())
-    }
-    val password = remember {
-        mutableStateOf(TextFieldValue())
-    }
-
     Column(
         modifier = Modifier
             .padding(20.dp)
@@ -49,9 +43,21 @@ fun LoginPage(navController: NavController) = Box(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
+
+        val mContext = LocalContext.current
+        val scope = rememberCoroutineScope()
+        val pref = remember(mContext) { Pref(mContext) }
+        val userName = remember {
+            mutableStateOf(TextFieldValue())
+        }
+        val password = remember {
+            mutableStateOf(TextFieldValue())
+        }
         Image(painter = painterResource(id = R.drawable.app_icon), contentDescription = "AppIcon")
         Text(
-            text = "Login", fontSize = 24.sp, fontWeight = FontWeight.Bold
+            text = "Hello, ${pref.getUserName.collectAsState("").value}!",
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold
         )
         Spacer(modifier = Modifier.size(20.dp))
         TextField(
@@ -85,25 +91,32 @@ fun LoginPage(navController: NavController) = Box(
             modifier = Modifier
                 .width(150.dp)
                 .padding(10.dp),
-            onClick = { onClick(userName,password,navController,mContext)}) {
-            Text(text = "Submit",
-            color = Color.White)
+            onClick = { onClick(userName, password, navController, mContext, pref, scope) }) {
+            Text(
+                text = "Submit",
+                color = Color.White
+            )
         }
 
     }
 }
 
+
 fun onClick(
     userName: MutableState<TextFieldValue>,
     password: MutableState<TextFieldValue>,
     navController: NavController,
-    mContext: Context
+    mContext: Context,
+    pref: Pref,
+    scope: CoroutineScope
 ) {
-    if(userName.value.text.contains("Rohan") && password.value.text.contains("12345678"))
-    {
+    if (userName.value.text.contains("Rohan") && password.value.text.contains("12345678")) {
+        scope.launch {
+            pref.saveUserName(userName.value.text)
+        }
+
         navController.navigate(Routes.DashBoard.route)
-    }
-    else {
+    } else {
         showToast(mContext, "Please Enter Valid Credentials")
     }
 }
