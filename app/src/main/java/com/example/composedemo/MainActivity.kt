@@ -32,7 +32,7 @@ class MainActivity() : ComponentActivity() {
                  * provide the navController which will control the navigation.
                  */
                 NavHost(
-                    navController = navController, startDestination = Routes.SplashScreen.route
+                    navController = navController, startDestination = Routes.DashBoard.route
                 ) {
 
                     //First route : Home

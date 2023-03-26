@@ -86,15 +86,13 @@ fun LoginPage(navController: NavController) = Box(
             )
         )
         Spacer(modifier = Modifier.size(20.dp))
-        Button(
-            shape = RoundedCornerShape(30.dp),
+        Button(shape = RoundedCornerShape(30.dp),
             modifier = Modifier
                 .width(150.dp)
                 .padding(10.dp),
             onClick = { onClick(userName, password, navController, mContext, pref, scope) }) {
             Text(
-                text = "Submit",
-                color = Color.White
+                text = "Submit", color = Color.White
             )
         }
 
@@ -114,7 +112,6 @@ fun onClick(
         scope.launch {
             pref.saveUserName(userName.value.text)
         }
-
         navController.navigate(Routes.DashBoard.route)
     } else {
         showToast(mContext, "Please Enter Valid Credentials")
